@@ -13,14 +13,16 @@ services:
       - ./configs/nginx.conf:/etc/nginx/nginx.conf
       - ./configs/ssl:/etc/letsencrypt/live/it-berries.ru
       - ./static/images:/usr/share/nginx/html/images
-      - frontend-build-volume:/usr/share/nginx/html
+      - build-volume:/usr/share/nginx/html/build
     command: nginx -g "daemon off";
+    links:
+      - backend
   certbot:
     image: certbot/certbot
   frontend:
-    image: explority-frontend-build:latest
+    image: itberriesmsk/explority-frontend:latest
     volumes:
-      - frontend-build-volume:/app/build
+      - build-volume:/app/build
   postgres:
     image: postgres:10
     restart: always
@@ -33,7 +35,7 @@ services:
       POSTGES_PASSWORD: shut-up-just-push
     command: postgres -N 1000
   backend:
-    image: shut-up-just-push
+    image: itberriesmsk/explority-backend:latest
     restart: always
     depends_on: 
       - postgres
@@ -41,4 +43,4 @@ services:
       - "8080:8080"
 
 volumes:
-  frontend-build-volume:
+  build-volume:
